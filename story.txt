@@ -1,0 +1,62 @@
+it should include an animation
+(implemented using JS) of the key yosh workflow where you say something
+like:
+
+pizlo@traitor:~$ yo show me the coredump pattern
+
+And for the yo prompt above, animate typing it character by character,
+since that's what the user types. And then they press enter and then you
+get:
+
+pizlo@traitor:~$ yo show me the coredump pattern
+Thinking...
+
+And then after ~0.5 sec you get:
+
+pizlo@traitor:~$ yo show me the coredump pattern
+Show the current core dump pattern configuration
+pizlo@traitor:~$ cat /proc/sys/kernel/core_pattern
+
+And then you press enter and you get:
+
+pizlo@traitor:~$ yo show me the coredump pattern
+Show the current core dump pattern configuration
+pizlo@traitor:~$ cat /proc/sys/kernel/core_pattern
+/var/coredumps/core.%e.%p
+pizlo@traitor:~$
+
+And then you type (again, typing animation):
+
+pizlo@traitor:~$ yo show me the coredump pattern
+Show the current core dump pattern configuration
+pizlo@traitor:~$ cat /proc/sys/kernel/core_pattern
+/var/coredumps/core.%e.%p
+pizlo@traitor:~$ yo what does that mean
+
+And then you get:
+
+pizlo@traitor:~$ yo show me the coredump pattern
+Show the current core dump pattern configuration
+pizlo@traitor:~$ cat /proc/sys/kernel/core_pattern
+/var/coredumps/core.%e.%p
+pizlo@traitor:~$ yo what does that mean
+Thinking...
+
+And then after ~1 sec you get:
+
+pizlo@traitor:~$ yo show me the coredump pattern
+Show the current core dump pattern configuration
+pizlo@traitor:~$ cat /proc/sys/kernel/core_pattern
+/var/coredumps/core.%e.%p
+pizlo@traitor:~$ yo what does that mean
+The core pattern `/var/coredumps/core.%e.%p` means:
+
+- **Location**: Core dumps are saved to `/var/coredumps/` directory
+- **Filename format**: `core.<executable_name>.<process_id>`
+  - `%e` = executable filename (the program that crashed)
+  - `%p` = process ID (PID) of the crashed process
+
+So if a program called `myapp` with PID 1234 crashes, the core dump would be saved as `/var/coredumps/core.myapp.1234`.
+
+This is a custom setup - by default, most systems either disable core dumps or save them as just `core` in the current directory. Having them organized in a dedicated directory with descriptive names makes debugging much easier!
+pizlo@traitor:~$

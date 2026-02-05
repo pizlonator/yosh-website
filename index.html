@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yosh — The LLM-Enabled Shell</title>
+    <meta name="description" content="Yosh is an LLM-enabled shell built on Bash. Type yo followed by what you want, and your shell does the rest.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0c191d;
+            color: #8aabab;
+            line-height: 1.6;
+            color-scheme: dark;
+        }
+
+        /* === Header === */
+        header {
+            text-align: center;
+            padding: 5rem 1.5rem 2.5rem;
+        }
+        header h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            color: #9ec5c5;
+            letter-spacing: -0.03em;
+        }
+        header .tagline {
+            font-size: 1.2rem;
+            color: #5a8282;
+            margin-top: 0.5rem;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* === Terminal === */
+        .demo {
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        .terminal {
+            background: #000;
+            border: 1px solid #1a2a2a;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+        }
+        .terminal-bar {
+            background: #2d2d2d;
+            padding: 6px 8px;
+            display: flex;
+            align-items: center;
+        }
+        .terminal-bar .title {
+            flex: 1;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #999;
+            font-family: 'Ubuntu', 'Cantarell', sans-serif;
+            font-weight: 500;
+        }
+        .terminal-bar .winctrls {
+            display: flex;
+            gap: 6px;
+            margin-left: auto;
+        }
+        .terminal-bar .winctrls span {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            color: #888;
+            font-size: 14px;
+            line-height: 1;
+        }
+        .terminal-bar .winctrls span:hover {
+            background: #444;
+            color: #ccc;
+        }
+        .terminal-body {
+            padding: 16px 18px;
+            font-family: 'Ubuntu Mono', 'Liberation Mono', 'Fira Code', 'JetBrains Mono', 'Cascadia Code', Consolas, monospace;
+            font-size: 14px;
+            line-height: 1.55;
+            height: 540px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+            color: #fff;
+        }
+
+        /* Terminal text styles */
+        .ps-user { color: #4ec940; }
+        .ps-sep  { color: #fff; }
+        .ps-path { color: #5c78ff; }
+        .ps-dollar { color: #fff; }
+        .llm { color: #5ed7d7; font-style: italic; }
+        .llm b { font-weight: bold; }
+        .llm .code { color: #fff; font-style: normal; }
+        .thinking { color: #5ed7d7; font-style: italic; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes blink {
+            50% { opacity: 0; }
+        }
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 15px;
+            background: #fff;
+            vertical-align: text-bottom;
+            margin-left: 1px;
+            animation: blink 1s step-end infinite;
+        }
+        .cursor.solid { animation: none; }
+
+        /* === About === */
+        .about {
+            max-width: 580px;
+            margin: 3.5rem auto;
+            padding: 0 1.5rem;
+            text-align: center;
+        }
+        .about p {
+            color: #5a7e7e;
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        /* === Features === */
+        .features {
+            max-width: 820px;
+            margin: 0 auto 3rem;
+            padding: 0 1.5rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+        }
+        .feature {
+            background: #0d1e23;
+            border: 1px solid #162c32;
+            border-radius: 6px;
+            padding: 1.25rem;
+        }
+        .feature h3 {
+            color: #7aacac;
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+        }
+        .feature p {
+            color: #4e7272;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        /* === Download === */
+        .download {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+        }
+        .download-btn {
+            display: inline-block;
+            background: #1a3a3a;
+            color: #9ec5c5;
+            border: 1px solid #2a5050;
+            padding: 0.75rem 2rem;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        .download-btn:hover {
+            background: #224848;
+            border-color: #3a6a6a;
+        }
+        .download-note {
+            margin-top: 0.75rem;
+            font-size: 0.85rem;
+            color: #3a5e5e;
+        }
+
+        /* === Footer === */
+        footer {
+            text-align: center;
+            padding: 2.5rem 1.5rem;
+            color: #263e3e;
+            font-size: 0.8rem;
+        }
+        footer a { color: #3a6060; text-decoration: none; }
+        footer a:hover { color: #5a9090; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Yosh</h1>
+        <p class="tagline">An LLM-enabled shell. Type what you want. Your shell does the rest.</p>
+    </header>
+
+    <section class="demo">
+        <div class="terminal">
+            <div class="terminal-bar">
+                <span class="title">pizlo@traitor: ~</span>
+                <div class="winctrls">
+                    <span>&#x2013;</span>
+                    <span>&#x25A1;</span>
+                    <span>&#x2715;</span>
+                </div>
+            </div>
+            <div class="terminal-body" id="term"></div>
+        </div>
+    </section>
+
+    <div class="about">
+        <p>Yosh is a custom build of Bash 5.2 with an integrated LLM assistant, compiled
+        with Fil-C for memory safety across the entire stack. Ask questions, generate
+        commands, and get explanations — without leaving your terminal.</p>
+    </div>
+
+    <section class="features">
+        <div class="feature">
+            <h3>Natural Language</h3>
+            <p>Type yo followed by what you want to do. Yosh translates your intent into shell commands.</p>
+        </div>
+        <div class="feature">
+            <h3>Session Memory</h3>
+            <p>Maintains conversation context. Follow up naturally and it understands what you mean.</p>
+        </div>
+        <div class="feature">
+            <h3>Terminal Aware</h3>
+            <p>A transparent PTY proxy captures your scrollback. The LLM sees what you see.</p>
+        </div>
+        <div class="feature">
+            <h3>Multi-Step Workflows</h3>
+            <p>Complex tasks that need multiple commands are handled automatically through continuation.</p>
+        </div>
+        <div class="feature">
+            <h3>Memory-Safe</h3>
+            <p>The entire stack — bash, readline, curl, openssl, zlib, libc — compiled with Fil-C.</p>
+        </div>
+        <div class="feature">
+            <h3>It's Just Bash</h3>
+            <p>All your commands, scripts, aliases, and config work exactly as before. Yo is opt-in.</p>
+        </div>
+    </section>
+
+    <div class="download">
+        <!-- TODO: Replace this URL with the real download link -->
+        <a class="download-btn" href="https://example.com/yosh-latest.tar.gz">Download Yosh (.tar.gz)</a>
+        <p class="download-note">Fil-C static binary for Linux/X86_64.</p>
+    </div>
+
+    <footer>
+        Built with Fil-C &middot; Powered by GNU Bash &middot; LLM by Anthropic
+    </footer>
+
+    <script>
+    (function() {
+        // ============================================================
+        // ANIMATION CONFIGURATION
+        // Edit these constants and the SEQUENCE array to change the demo.
+        // ============================================================
+
+        var TYPING_SPEED  = 45;   // ms per character
+        var TYPING_JITTER = 25;   // random +/- ms variation
+        var LOOP_DELAY    = 6000; // ms pause at end before restarting
+
+        // The LLM chat response for "yo what does that mean".
+        // **text** becomes bold; `text` becomes white (code highlight).
+        var EXPLAIN_RESPONSE = [
+            'The core pattern `/var/coredumps/core.%e.%p` means:',
+            '',
+            '- **Location**: Core dumps are saved to `/var/coredumps/` directory',
+            '- **Filename format**: `core.<executable_name>.<process_id>`',
+            '  - `%e` = executable filename (the program that crashed)',
+            '  - `%p` = process ID (PID) of the crashed process',
+            '',
+            'So if a program called `myapp` with PID 1234 crashes, the core',
+            'dump would be saved as `/var/coredumps/core.myapp.1234`.',
+            '',
+            'This is a custom setup - by default, most systems either disable',
+            'core dumps or save them as just `core` in the current directory.',
+            'Having them organized in a dedicated directory with descriptive',
+            'names makes debugging much easier!',
+        ];
+
+        // Each step is { action: '...', ... }
+        //   prompt        – show pizlo@traitor:~$
+        //   type          – typing animation  { text }
+        //   pause         – wait              { ms }
+        //   enter         – newline
+        //   thinking      – pulsing indicator { ms }
+        //   llm-line      – single italic cyan line { text }
+        //   llm-block     – multi-line cyan block   { lines: [] }
+        //   prompt-prefill – prompt + pre-filled command { text }
+        //   output        – plain white output line     { text }
+        var SEQUENCE = [
+            { action: 'prompt' },
+            { action: 'type',    text: 'yo show me the coredump pattern' },
+            { action: 'pause',   ms: 300 },
+            { action: 'enter' },
+            { action: 'thinking', ms: 500 },
+            { action: 'llm-line', text: 'Show the current core dump pattern configuration' },
+            { action: 'prompt-prefill', text: 'cat /proc/sys/kernel/core_pattern' },
+            { action: 'pause',   ms: 1200 },
+            { action: 'enter' },
+            { action: 'output',  text: '/var/coredumps/core.%e.%p' },
+            { action: 'prompt' },
+            { action: 'pause',   ms: 600 },
+            { action: 'type',    text: 'yo what does that mean' },
+            { action: 'pause',   ms: 300 },
+            { action: 'enter' },
+            { action: 'thinking', ms: 1200 },
+            { action: 'llm-block', lines: EXPLAIN_RESPONSE },
+            { action: 'prompt' },
+            { action: 'pause',   ms: LOOP_DELAY },
+        ];
+
+        // ============================================================
+        // TERMINAL ENGINE
+        // ============================================================
+
+        var el = document.getElementById('term');
+
+        var PROMPT =
+            '<span class="ps-user">pizlo@traitor</span>' +
+            '<span class="ps-sep">:</span>' +
+            '<span class="ps-path">~</span>' +
+            '<span class="ps-dollar">$ </span>';
+
+        var html = '';
+        var temp = '';
+        var cursorMode = 'blink';
+
+        function esc(s) {
+            return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        function formatLlm(text) {
+            var s = esc(text);
+            return s;
+        }
+
+        function sleep(ms) {
+            return new Promise(function(r) { setTimeout(r, ms); });
+        }
+
+        function render() {
+            var c = cursorMode === 'hidden' ? ''
+                  : '<span class="cursor' + (cursorMode === 'solid' ? ' solid' : '') + '"></span>';
+            el.innerHTML = html + temp + c;
+            el.scrollTop = el.scrollHeight;
+        }
+
+        async function run() {
+            while (true) {
+                html = '';
+                temp = '';
+                cursorMode = 'blink';
+                render();
+
+                for (var i = 0; i < SEQUENCE.length; i++) {
+                    var step = SEQUENCE[i];
+
+                    switch (step.action) {
+
+                    case 'prompt':
+                        html += PROMPT;
+                        render();
+                        break;
+
+                    case 'type':
+                        cursorMode = 'solid';
+                        for (var j = 0; j < step.text.length; j++) {
+                            html += esc(step.text[j]);
+                            render();
+                            await sleep(TYPING_SPEED + (Math.random() * TYPING_JITTER * 2 - TYPING_JITTER));
+                        }
+                        cursorMode = 'blink';
+                        render();
+                        break;
+
+                    case 'pause':
+                        await sleep(step.ms);
+                        break;
+
+                    case 'enter':
+                        html += '\n';
+                        render();
+                        break;
+
+                    case 'thinking':
+                        cursorMode = 'hidden';
+                        temp = '<span class="thinking">Thinking...</span>';
+                        render();
+                        await sleep(step.ms);
+                        temp = '';
+                        cursorMode = 'blink';
+                        break;
+
+                    case 'llm-line':
+                        html += '<span class="llm">' + formatLlm(step.text) + '</span>\n';
+                        render();
+                        break;
+
+                    case 'llm-block':
+                        html += '<span class="llm">';
+                        for (var k = 0; k < step.lines.length; k++) {
+                            html += formatLlm(step.lines[k]);
+                            if (k < step.lines.length - 1) html += '\n';
+                        }
+                        html += '</span>\n';
+                        render();
+                        break;
+
+                    case 'prompt-prefill':
+                        html += PROMPT + esc(step.text);
+                        render();
+                        break;
+
+                    case 'output':
+                        html += esc(step.text) + '\n';
+                        render();
+                        break;
+                    }
+                }
+            }
+        }
+
+        run();
+    })();
+    </script>
+</body>
+</html>

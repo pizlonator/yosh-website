@@ -4,22 +4,13 @@ This file provides guidance to Claude Code when working with the yosh-website re
 
 ## Project Overview
 
-This is the landing page / marketing website for **Yosh**, an LLM-enabled shell. It's a single `index.html` file — all CSS and JS are inline. No build system, no dependencies, no frameworks.
+This is the landing page / marketing website for **Yosh**, an LLM-enabled shell. It's a single `website/index.html` file — all CSS and JS are inline. No build system, no dependencies, no frameworks.
 
 The companion project is at `../yosh/` — read its `CLAUDE.md` and plan files for deep context on what yosh does and how it works.
 
 ## How to Preview
 
-Open `index.html` directly in a browser. That's it.
-
-## File Structure
-
-```
-yosh-website/
-├── index.html    # The entire website (HTML + CSS + JS)
-├── story.txt     # The animation script / storyboard (reference only)
-└── CLAUDE.md     # This file
-```
+Open `website/index.html` directly in a browser. That's it.
 
 ## Page Sections (in order)
 

@@ -285,15 +285,26 @@
     (function() {
         // ============================================================
         // ANIMATION CONFIGURATION
-        // Edit these constants and the SEQUENCE array to change the demo.
+        // Edit these constants and the ANIMATIONS array to change the demo.
         // ============================================================
 
         var TYPING_SPEED  = 45;   // ms per character
         var TYPING_JITTER = 25;   // random +/- ms variation
         var LOOP_DELAY    = 6000; // ms pause at end before restarting
 
-        // The LLM chat response for "yo what does that mean".
-        // **text** becomes bold; `text` becomes white (code highlight).
+        // Each step is { action: '...', ... }
+        //   prompt        – show the PS1 prompt
+        //   type          – typing animation  { text }
+        //   pause         – wait              { ms }
+        //   enter         – newline
+        //   thinking      – pulsing indicator { ms }
+        //   llm-line      – single italic cyan line { text }
+        //   llm-block     – multi-line cyan block   { lines: [] }
+        //   prompt-prefill – prompt + pre-filled command { text }
+        //   output        – plain white output line     { text }
+
+        // --- Animation 1: coredump pattern (pizlo@traitor) ---
+
         var EXPLAIN_RESPONSE = [
             'The core pattern `/var/coredumps/core.%e.%p` means:',
             '',
@@ -311,36 +322,95 @@
             'names makes debugging much easier!',
         ];
 
-        // Each step is { action: '...', ... }
-        //   prompt        – show pizlo@traitor:~$
-        //   type          – typing animation  { text }
-        //   pause         – wait              { ms }
-        //   enter         – newline
-        //   thinking      – pulsing indicator { ms }
-        //   llm-line      – single italic cyan line { text }
-        //   llm-block     – multi-line cyan block   { lines: [] }
-        //   prompt-prefill – prompt + pre-filled command { text }
-        //   output        – plain white output line     { text }
-        var SEQUENCE = [
+        var SEQUENCE_1 = [
             { action: 'prompt' },
             { action: 'type',    text: 'yo show me the coredump pattern' },
-            { action: 'pause',   ms: 300 },
+            { action: 'pause',   ms: 1000 },
             { action: 'enter' },
-            { action: 'thinking', ms: 500 },
+            { action: 'thinking', ms: 1000 },
             { action: 'llm-line', text: 'Show the current core dump pattern configuration' },
             { action: 'prompt-prefill', text: 'cat /proc/sys/kernel/core_pattern' },
-            { action: 'pause',   ms: 1200 },
+            { action: 'pause',   ms: 1000 },
             { action: 'enter' },
             { action: 'output',  text: '/var/coredumps/core.%e.%p' },
             { action: 'prompt' },
             { action: 'pause',   ms: 600 },
             { action: 'type',    text: 'yo what does that mean' },
-            { action: 'pause',   ms: 300 },
+            { action: 'pause',   ms: 1000 },
             { action: 'enter' },
-            { action: 'thinking', ms: 1200 },
+            { action: 'thinking', ms: 1000 },
             { action: 'llm-block', lines: EXPLAIN_RESPONSE },
             { action: 'prompt' },
             { action: 'pause',   ms: LOOP_DELAY },
+        ];
+
+        // --- Animation 2: USB stick (pizlo@megadeth) ---
+
+        var USB_MOUNT_RESPONSE = [
+            'Your USB stick is mounted at `/media/pizlo/USB321FD`',
+            '',
+            'It\'s the 231GB device (sda1) that the system auto-mounted for you.',
+        ];
+
+        var SEQUENCE_2 = [
+            { action: 'prompt' },
+            { action: 'type',    text: 'yo where is my usb stick mounted' },
+            { action: 'pause',   ms: 1000 },
+            { action: 'enter' },
+            { action: 'thinking', ms: 1000 },
+            { action: 'llm-line', text: 'Show all disks and partitions with their mount points to find your USB stick' },
+            { action: 'prompt-prefill', text: 'lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -E "disk|part"' },
+            { action: 'pause',   ms: 1000 },
+            { action: 'enter' },
+            { action: 'output',  text: 'sda             231G disk  ' },
+            { action: 'output',  text: '\u2514\u2500sda1        230.9G part  /media/pizlo/USB321FD' },
+            { action: 'output',  text: 'zram0            16G disk  [SWAP]' },
+            { action: 'output',  text: 'nvme0n1         1.8T disk  ' },
+            { action: 'output',  text: '\u251C\u2500nvme0n1p1     512M part  /boot/efi' },
+            { action: 'output',  text: '\u251C\u2500nvme0n1p2       4G part  /recovery' },
+            { action: 'output',  text: '\u251C\u2500nvme0n1p3     1.8T part  /' },
+            { action: 'output',  text: '\u2514\u2500nvme0n1p4       4G part' },
+            { action: 'thinking', ms: 1000 },
+            { action: 'llm-block', lines: USB_MOUNT_RESPONSE },
+            { action: 'prompt' },
+            { action: 'pause',   ms: 600 },
+            { action: 'type',    text: 'yo what fs is it' },
+            { action: 'pause',   ms: 1000 },
+            { action: 'enter' },
+            { action: 'thinking', ms: 1000 },
+            { action: 'llm-line', text: 'Check the filesystem type of your USB stick' },
+            { action: 'prompt-prefill', text: 'lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT /dev/sda1' },
+            { action: 'pause',   ms: 1000 },
+            { action: 'enter' },
+            { action: 'output',  text: 'NAME FSTYPE   SIZE MOUNTPOINT' },
+            { action: 'output',  text: 'sda1 vfat   230.9G /media/pizlo/USB321FD' },
+            { action: 'thinking', ms: 1000 },
+            { action: 'llm-line', text: 'It\'s **vfat** (FAT32/exFAT), which is the standard filesystem for USB sticks that works across Windows, Mac, and Linux.' },
+            { action: 'prompt' },
+            { action: 'pause',   ms: LOOP_DELAY },
+        ];
+
+        // --- All animations, played in order and cycling ---
+
+        var ANIMATIONS = [
+            {
+                barTitle: 'pizlo@traitor: ~',
+                prompt:
+                    '<span class="ps-user">pizlo@traitor</span>' +
+                    '<span class="ps-sep">:</span>' +
+                    '<span class="ps-path">~</span>' +
+                    '<span class="ps-dollar">$ </span>',
+                sequence: SEQUENCE_1,
+            },
+            {
+                barTitle: 'pizlo@megadeth: ~',
+                prompt:
+                    '<span class="ps-user">pizlo@megadeth</span>' +
+                    '<span class="ps-sep">:</span>' +
+                    '<span class="ps-path">~</span>' +
+                    '<span class="ps-dollar">$ </span>',
+                sequence: SEQUENCE_2,
+            },
         ];
 
         // ============================================================
@@ -348,16 +418,12 @@
         // ============================================================
 
         var el = document.getElementById('term');
-
-        var PROMPT =
-            '<span class="ps-user">pizlo@traitor</span>' +
-            '<span class="ps-sep">:</span>' +
-            '<span class="ps-path">~</span>' +
-            '<span class="ps-dollar">$ </span>';
+        var barTitle = document.querySelector('.terminal-bar .title');
 
         var html = '';
         var temp = '';
         var cursorMode = 'blink';
+        var currentPrompt = '';
 
         function esc(s) {
             return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -380,19 +446,25 @@
         }
 
         async function run() {
+            var animIndex = 0;
             while (true) {
+                var anim = ANIMATIONS[animIndex];
+                currentPrompt = anim.prompt;
+                barTitle.textContent = anim.barTitle;
+
                 html = '';
                 temp = '';
                 cursorMode = 'blink';
                 render();
 
-                for (var i = 0; i < SEQUENCE.length; i++) {
-                    var step = SEQUENCE[i];
+                var seq = anim.sequence;
+                for (var i = 0; i < seq.length; i++) {
+                    var step = seq[i];
 
                     switch (step.action) {
 
                     case 'prompt':
-                        html += PROMPT;
+                        html += currentPrompt;
                         render();
                         break;
 
@@ -441,7 +513,7 @@
                         break;
 
                     case 'prompt-prefill':
-                        html += PROMPT + esc(step.text);
+                        html += currentPrompt + esc(step.text);
                         render();
                         break;
 
@@ -451,6 +523,8 @@
                         break;
                     }
                 }
+
+                animIndex = (animIndex + 1) % ANIMATIONS.length;
             }
         }
 

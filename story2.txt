@@ -1,0 +1,153 @@
+First the user types:
+
+pizlo@megadeth:~$ yo where is my usb stick mounted
+
+Show the typing animation for the "yo" prompt.
+
+Then:
+
+pizlo@megadeth:~$ yo where is my usb stick mounted
+Thinking...
+
+Then after 0.5 sec you get:
+
+pizlo@megadeth:~$ yo where is my usb stick mounted
+Show all disks and partitions with their mount points to find your USB stick
+pizlo@megadeth:~$ lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -E "disk|part"
+
+And then a delay before the user presses enter and you get:
+
+pizlo@megadeth:~$ yo where is my usb stick mounted
+Show all disks and partitions with their mount points to find your USB stick
+pizlo@megadeth:~$ lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -E "disk|part"
+sda             231G disk  
+└─sda1        230.9G part  /media/pizlo/USB321FD
+zram0            16G disk  [SWAP]
+nvme0n1         1.8T disk  
+├─nvme0n1p1     512M part  /boot/efi
+├─nvme0n1p2       4G part  /recovery
+├─nvme0n1p3     1.8T part  /
+└─nvme0n1p4       4G part
+Thinking...
+
+And then after a 0.5 sec delay you get:
+
+pizlo@megadeth:~$ yo where is my usb stick mounted
+Show all disks and partitions with their mount points to find your USB stick
+pizlo@megadeth:~$ lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -E "disk|part"
+sda             231G disk  
+└─sda1        230.9G part  /media/pizlo/USB321FD
+zram0            16G disk  [SWAP]
+nvme0n1         1.8T disk  
+├─nvme0n1p1     512M part  /boot/efi
+├─nvme0n1p2       4G part  /recovery
+├─nvme0n1p3     1.8T part  /
+└─nvme0n1p4       4G part
+Your USB stick is mounted at `/media/pizlo/USB321FD`
+
+It's the 231GB device (sda1) that the system auto-mounted for you.
+pizlo@megadeth:~$ 
+
+Then the user types another yo command:
+
+pizlo@megadeth:~$ yo where is my usb stick mounted
+Show all disks and partitions with their mount points to find your USB stick
+pizlo@megadeth:~$ lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -E "disk|part"
+sda             231G disk  
+└─sda1        230.9G part  /media/pizlo/USB321FD
+zram0            16G disk  [SWAP]
+nvme0n1         1.8T disk  
+├─nvme0n1p1     512M part  /boot/efi
+├─nvme0n1p2       4G part  /recovery
+├─nvme0n1p3     1.8T part  /
+└─nvme0n1p4       4G part
+Your USB stick is mounted at `/media/pizlo/USB321FD`
+
+It's the 231GB device (sda1) that the system auto-mounted for you.
+pizlo@megadeth:~$ yo what fs is it
+
+And then we get:
+
+pizlo@megadeth:~$ yo where is my usb stick mounted
+Show all disks and partitions with their mount points to find your USB stick
+pizlo@megadeth:~$ lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -E "disk|part"
+sda             231G disk  
+└─sda1        230.9G part  /media/pizlo/USB321FD
+zram0            16G disk  [SWAP]
+nvme0n1         1.8T disk  
+├─nvme0n1p1     512M part  /boot/efi
+├─nvme0n1p2       4G part  /recovery
+├─nvme0n1p3     1.8T part  /
+└─nvme0n1p4       4G part
+Your USB stick is mounted at `/media/pizlo/USB321FD`
+
+It's the 231GB device (sda1) that the system auto-mounted for you.
+pizlo@megadeth:~$ yo what fs is it
+Thinking...
+
+And then after a ~0.5 second delay we get:
+
+pizlo@megadeth:~$ yo where is my usb stick mounted
+Show all disks and partitions with their mount points to find your USB stick
+pizlo@megadeth:~$ lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -E "disk|part"
+sda             231G disk  
+└─sda1        230.9G part  /media/pizlo/USB321FD
+zram0            16G disk  [SWAP]
+nvme0n1         1.8T disk  
+├─nvme0n1p1     512M part  /boot/efi
+├─nvme0n1p2       4G part  /recovery
+├─nvme0n1p3     1.8T part  /
+└─nvme0n1p4       4G part
+Your USB stick is mounted at `/media/pizlo/USB321FD`
+
+It's the 231GB device (sda1) that the system auto-mounted for you.
+pizlo@megadeth:~$ yo what fs is it
+Check the filesystem type of your USB stick
+pizlo@megadeth:~$ lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT /dev/sda1
+
+And then a pause before the user presses enter and then:
+
+pizlo@megadeth:~$ yo where is my usb stick mounted
+Show all disks and partitions with their mount points to find your USB stick
+pizlo@megadeth:~$ lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -E "disk|part"
+sda             231G disk  
+└─sda1        230.9G part  /media/pizlo/USB321FD
+zram0            16G disk  [SWAP]
+nvme0n1         1.8T disk  
+├─nvme0n1p1     512M part  /boot/efi
+├─nvme0n1p2       4G part  /recovery
+├─nvme0n1p3     1.8T part  /
+└─nvme0n1p4       4G part
+Your USB stick is mounted at `/media/pizlo/USB321FD`
+
+It's the 231GB device (sda1) that the system auto-mounted for you.
+pizlo@megadeth:~$ yo what fs is it
+Check the filesystem type of your USB stick
+pizlo@megadeth:~$ lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT /dev/sda1
+NAME FSTYPE   SIZE MOUNTPOINT
+sda1 vfat   230.9G /media/pizlo/USB321FD
+Thinking...
+
+And then after a 0.5 second delay we get:
+
+pizlo@megadeth:~$ yo where is my usb stick mounted
+Show all disks and partitions with their mount points to find your USB stick
+pizlo@megadeth:~$ lsblk -o NAME,SIZE,TYPE,MOUNTPOINT | grep -E "disk|part"
+sda             231G disk  
+└─sda1        230.9G part  /media/pizlo/USB321FD
+zram0            16G disk  [SWAP]
+nvme0n1         1.8T disk  
+├─nvme0n1p1     512M part  /boot/efi
+├─nvme0n1p2       4G part  /recovery
+├─nvme0n1p3     1.8T part  /
+└─nvme0n1p4       4G part
+Your USB stick is mounted at `/media/pizlo/USB321FD`
+
+It's the 231GB device (sda1) that the system auto-mounted for you.
+pizlo@megadeth:~$ yo what fs is it
+Check the filesystem type of your USB stick
+pizlo@megadeth:~$ lsblk -o NAME,FSTYPE,SIZE,MOUNTPOINT /dev/sda1
+NAME FSTYPE   SIZE MOUNTPOINT
+sda1 vfat   230.9G /media/pizlo/USB321FD
+It's **vfat** (FAT32/exFAT), which is the standard filesystem for USB sticks that works across Windows, Mac, and Linux.
+pizlo@megadeth:~$ 

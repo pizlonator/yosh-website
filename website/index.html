@@ -272,13 +272,13 @@
 
     <div class="download">
         <!-- TODO: Replace this URL with the real download link -->
-        <a class="download-btn" href="yosh-0.1.1.tar.gz">Download Yosh 0.1.1 (.tar.gz)</a>
+        <a class="download-btn" href="yosh-0.1.2.tar.gz">Download Yosh 0.1.2 (.tar.gz)</a>
         <p class="download-note"><a href="https://fil-c.org/" class="inline-link">Fil-C</a> static binary for Linux/X86_64.</p>
         <p class="download-note"><a href="https://github.com/pizlonator/yosh" class="source-link">Source code on GitHub</a></p>
     </div>
 
     <footer>
-        Built with <a href="https://fil-c.org/">Fil-C</a> &middot; Powered by GNU Bash &middot; LLM by Anthropic
+        Built with <a href="https://fil-c.org/">Fil-C</a> &middot; Powered by GNU Bash &middot; LLM by Anthropic or OpenAI
     </footer>
 
     <script>
@@ -431,6 +431,10 @@
 
         function formatLlm(text) {
             var s = esc(text);
+            // Render `code` as white, non-italic text
+            s = s.replace(/`([^`]+)`/g, '<span class="code">$1</span>');
+            // Render **bold** as bold, cyan, italic text
+            s = s.replace(/\*\*([^*]+)\*\*/g, '<b>$1</b>');
             return s;
         }
 
